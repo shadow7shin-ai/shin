@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/2830/2830114.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2830/2830114.png">
+    <meta name="theme-color" content="#ecfdf5">
+    <title>FISHING LIFE v3.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+        
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background: #000; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        body { font-family: 'Pretendard', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        .app-wrapper { 
+            display: flex; flex-direction: column; 
+            height: 100dvh; 
+            aspect-ratio: 7.5 / 15;
+            background-color: #ffffff;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 100px rgba(0,0,0,0.5);
+        }
+
+        .main-bg {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)), 
+                              url('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1200&q=90');
+            background-size: cover; background-position: center bottom;
+            z-index: 0;
+        }
+
+        .app-header {
+            background: #ecfdf5; 
+            padding: 10px 12px 14px 12px;
+            display: flex; flex-direction: column; gap: 6px;
+            z-index: 100;
+            border-bottom: 4px solid #064e3b;
+        }
+        
+        .app-title-container { display: flex; align-items: center; justify-content: center; position: relative; }
+        .app-title {
+            text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2rem;
+            background: linear-gradient(135deg, #064e3b 0%, #10b981 50%, #064e3b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            line-height: 1; margin: 5px 0;
+        }
+        .import-btn { position: absolute; right: 0; background: #fff; border: 2px solid #064e3b; border-radius: 8px; font-size: 10px; font-weight: 900; padding: 4px 8px; color: #064e3b; }
+
+        .header-controls { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+
+        .fishing-hero { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; position: relative; overflow: visible; }
+        .fishing-hero img { height: 85px !important; width: auto !important; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.15)); transform: translateY(-2px); display: block; }
+
+        .view-container { flex: 1; display: flex; width: 100%; overflow: hidden; position: relative; z-index: 10; }
+        .view-page { width: 100%; height: 100%; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; background: transparent; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); gap: 2px; padding: 4px; flex: 1; }
+        .day-cell { background: rgba(255, 255, 255, 0.96); padding: 2px; position: relative; display: flex; flex-direction: column; border-radius: 4px; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); border: 1.5px solid #000; transition: all 0.2s; }
+        
+        .is-today { border: 2.5px solid #00f3ff !important; box-shadow: 0 0 12px rgba(0, 243, 255, 0.8) !important; z-index: 20; }
+        .has-record { border: 2.5px solid #ef4444 !important; box-shadow: 0 0 8px rgba(239, 68, 68, 0.3) !important; }
+        
+        .day-number { font-size: 0.85rem; font-weight: 950; color: #000; line-height: 1; }
+        .day-sun { color: #f43f5e; }
+        .day-sat { color: #3b82f6; }
+
+        .fish-badge { font-size: 0.52rem; font-weight: 950; padding: 1px; border-radius: 2px; border: 1.2px solid #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; color: #000 !important; margin-top: 1px; }
+        .fish-name { background-color: #dcfce7; font-size: 0.75rem !important; line-height: 1.1; } 
+        .fish-spec { background-color: #3b82f6 !important; color: #fff !important; }
+        .fish-type { background-color: #ef4444 !important; color: #fff !important; }
+
+        .tide-section { margin-top: auto; padding-top: 1px; border-top: 1px solid rgba(0,0,0,0.05); min-height: 28px; }
+        .tide-label { font-size: 0.58rem; color: #000 !important; font-weight: 950 !important; text-align: center; display: block; }
+        .weather-summary { font-size: 0.38rem; color: #000; text-align: center; font-weight: 900; line-height: 1; margin-bottom: 1px; }
+        
+        .current-bar-bg { height: 4px; background-color: #f1f5f9; border-radius: 3px; border: 1px solid #000; overflow: hidden; margin-top: 1px; }
+        .current-bar-fill { height: 100%; background: #2563eb; }
+
+        .app-footer { background: #ffffff; border-top: 4px solid #000; shrink-0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .btn-primary { background-color: #000 !important; color: #fff !important; font-weight: 900; border-radius: 10px; }
+        .active-selection { background-color: #fb923c !important; color: #fff !important; box-shadow: 3px 3px 0px #000; transform: translateY(-1px); }
+        .nav-btn { color: #cbd5e1; transition: all 0.2s; }
+        .nav-active { color: #000 !important; font-weight: 950; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: #e2e8f0; transition: all 0.3s; }
+        .dot.active { width: 18px; background: #000; border-radius: 10px; }
+
+        .record-box { display: flex; align-items: center; gap: 1px; background: #fff; border: 1.5px solid #000; border-radius: 4px; padding: 0 2px; height: 30px; }
+        .record-input { width: 100%; background: transparent; font-size: 10px; font-weight: 800; outline: none; text-align: right; border: none; color: black; }
+        
+        .modal-input { width: 100%; padding: 10px; background: #f8fafc; border: 2px solid #000; border-radius: 8px; font-weight: 800; font-size: 12px; margin-bottom: 8px; outline: none; }
+        .payment-check { display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 900; }
+        .import-textarea { width: 100%; height: 180px; padding: 15px; background: #f0fdf4; border: 3px solid #064e3b; border-radius: 15px; font-weight: 800; font-size: 11px; outline: none; resize: none; margin-bottom: 10px; color: black; }
+
+        .rank-grid-item { background: #fff; border: 1.5px solid #000; border-radius: 8px; padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; position: relative; min-height: 42px; }
+        .rank-tag-mini { font-size: 10px; font-weight: 950; display: flex; align-items: center; gap: 2px; line-height: 1; }
+        .rank-val-mini { font-size: 8px; font-weight: 800; color: #3b82f6; margin-top: 2px; line-height: 1; }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper text-black text-left">
+        <div class="main-bg"></div> 
+
+        <header class="app-header">
+            <div class="app-title-container">
+                <div class="app-title">FISHING LIFE</div>
+                <button onclick="openImportModal()" class="import-btn shadow-sm active:scale-95">가져오기</button>
+            </div>
+            <div class="header-controls text-black">
+                <div class="flex items-center gap-1">
+                    <!-- 년/월 크기 14px 고정 -->
+                    <select id="yearSelect" onchange="jumpDate()" class="text-[14px] font-black bg-white rounded-lg px-2 py-1 outline-none border-2 border-black text-black"></select>
+                    <select id="monthSelect" onchange="jumpDate()" class="text-[14px] font-black bg-white rounded-lg px-2 py-1 outline-none border-2 border-black text-black"></select>
+                </div>
+                <div class="fishing-hero"><img src="image_c7f6fb.png" alt="낚시꾼 실사" id="heroImage" onerror="this.style.display='none'"></div>
+                <div class="flex flex-col gap-1 items-end text-black">
+                    <select id="regionSelect" class="bg-white text-[8px] font-black rounded-md px-1 py-0.5 outline-none border-2 border-black w-16 text-black">
+                        <option value="인천">인천</option><option value="경기">경기</option><option value="서울">서울</option><option value="충남">충남</option><option value="전북">전북</option><option value="전남">전남</option><option value="경남">경남</option><option value="경북">경북</option><option value="강원">강원</option>
+                    </select>
+                    <button onclick="refreshLiveInfo()" class="px-2 py-0.5 bg-orange-500 text-black text-[9px] font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all">날씨 갱신</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="view-container no-scrollbar" id="viewContainer">
+            <section class="view-page" id="pageCalendar">
+                <div class="bg-white/95 border-b-2 border-black grid grid-cols-7 text-center py-1 font-black text-[10px] text-black tracking-[0.2em]">
+                    <div class="text-rose-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
+                </div>
+                <div id="calendar" class="calendar-grid"></div>
+            </section>
+            
+            <section class="view-page hidden" id="pageStats">
+                <div class="p-4 bg-white min-h-full text-black text-left">
+                    <h3 class="text-xl font-black mb-4 border-b-4 border-black pb-1 text-black tracking-tighter text-left italic">🏆 LEADERS BOARD</h3>
+                    <div id="statsContainer" class="space-y-4 pb-24 text-black text-left"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <div class="flex justify-center gap-3 py-2"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div></div>
+            <div class="flex justify-around items-center px-4 pb-4 text-slate-400">
+                <button onclick="scrollToPage(0)" id="tab0" class="nav-btn flex flex-col items-center gap-1 nav-active transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="text-[9px] font-black">달력</span></button>
+                <button onclick="scrollToPage(1)" id="tab1" class="nav-btn flex flex-col items-center gap-1 transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span class="text-[9px] font-black">현황</span></button>
+                <button onclick="openNameSettings()" class="nav-btn flex flex-col items-center gap-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span class="text-[9px] font-black">친구</span></button>
+                <button onclick="triggerResetAll()" class="nav-btn flex flex-col items-center gap-1 text-rose-300"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span class="text-[9px] font-black text-rose-500">리셋</span></button>
+            </div>
+        </footer>
+    </div>
+
+    <div id="overlay" class="fixed inset-0 bg-black/80 hidden z-[900]" onclick="window.closeAllModals()"></div>
+    
+    <div id="choiceSheet" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white rounded-t-[30px] p-8 transform translate-y-full transition-transform z-[1000] border-t-6 border-black text-black text-left">
+        <h3 id="choiceDateTitle" class="text-center font-black text-2xl mb-8">메뉴 선택</h3>
+        <div class="flex flex-col gap-3">
+            <button onclick="goToSetup()" class="w-full py-4 btn-primary rounded-xl active:scale-95 shadow-lg text-white text-lg">⚙️ 출조 설정</button>
+            <button onclick="goToSetup(true)" class="w-full py-4 bg-amber-50 border-3 border-amber-400 text-amber-700 rounded-xl font-black text-lg active:scale-95">✏️ 정보 수정</button>
+            <button onclick="showDayInfo()" class="w-full py-4 bg-white border-3 border-black text-black rounded-xl font-black text-lg active:scale-95">ℹ️ 정보 확인</button>
+            <button onclick="window.exportToKakao()" class="w-full py-3 bg-emerald-50 border-2 border-emerald-400 text-emerald-700 rounded-xl font-black text-sm active:scale-95 text-center">📤 카톡으로 보내기</button>
+            <button onclick="triggerClearDate()" class="w-full py-2 text-rose-600 font-black text-xs uppercase tracking-widest mt-2 text-center block">데이터 삭제</button>
+            <button onclick="window.closeAllModals()" class="w-full py-2 text-slate-400 font-bold text-center block text-black text-center">닫기</button>
+        </div>
+    </div>
+
+    <!-- 출조 설정 모달 -->
+    <div id="inputSheet" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white rounded-t-[30px] p-6 transform translate-y-full transition-transform z-[1010] border-t-6 border-black max-h-[96vh] overflow-y-auto text-black text-left">
+        <h3 id="inputModalTitle" class="text-2xl font-black mb-6 text-center text-black">출조 설정</h3>
+        <div class="space-y-6 text-black text-left">
+            <div><p class="text-[13px] font-black border-b-2 border-black pb-1 uppercase text-left">1. 참가자 선택 (중복 가능)</p><div class="grid grid-cols-4 gap-2 mt-3" id="modalNameList"></div></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><p class="text-[13px] font-black border-b-2 border-black pb-1 text-left">2. 상태</p><div class="flex flex-col gap-2 mt-3 text-black"><button onclick="selectStatus('출조')" class="status-btn py-3 bg-slate-50 border-2 border-black rounded-xl text-sm font-black text-center">출조</button><button onclick="selectStatus('대기')" class="status-btn py-3 bg-slate-50 border-2 border-black rounded-xl text-sm font-black text-center">대기</button></div></div>
+                <div><p class="text-[13px] font-black border-b-2 border-black pb-1 text-left">3. 타입</p><div class="flex flex-col gap-2 mt-3 text-black"><button onclick="selectPlace('선상')" class="place-btn py-2 bg-slate-50 border-2 border-black rounded-xl text-[10px] font-black text-center">선상</button><button onclick="selectPlace('워킹')" class="place-btn py-2 bg-slate-50 border-2 border-black rounded-xl text-[10px] font-black text-center">워킹</button><button onclick="selectPlace('양식장')" class="place-btn py-2 bg-slate-50 border-2 border-black rounded-xl text-[10px] font-black text-black text-center">양식장</button></div></div>
+            </div>
+            <div>
+                <p class="text-[13px] font-black border-b-2 border-black pb-1 text-left text-black">4. 상세 정보</p>
+                <select id="modalSpecies" class="modal-input mt-3 text-black"><option value="">어종 선택</option><option value="우럭">우럭</option><option value="광어">광어</option><option value="참돔">참돔</option><option value="쭈꾸미">쭈꾸미</option><option value="갑오징어">갑오징어</option><option value="문어">문어</option><option value="기타">기타</option></select>
+                <input type="text" id="modalLink" placeholder="예약 URL (https://...)" class="modal-input text-black">
+                <input type="text" id="modalShip" placeholder="배 이름" class="modal-input text-black">
+                <div class="flex gap-2 text-black"><input type="text" id="modalFee" placeholder="선비 금액" class="modal-input flex-1"><input type="text" id="modalAccount" placeholder="입금 계좌 정보" class="modal-input flex-[2]"></div>
+            </div>
+            <div id="paymentSection" class="hidden text-left text-black text-left">
+                <p class="text-[13px] font-black border-b-2 border-black pb-1 mb-3 text-black text-left">5. 선비 입금 체크 (대표자용)</p>
+                <div id="paymentList" class="flex flex-col gap-2 text-black text-left"></div>
+            </div>
+        </div>
+        <div class="mt-8 grid grid-cols-2 gap-4 pb-10">
+            <button onclick="saveAndExit()" class="py-4 btn-primary text-lg text-white rounded-xl shadow-lg">저장</button>
+            <button onclick="window.closeAllModals()" class="py-4 bg-slate-200 text-black rounded-xl font-black text-lg">취소</button>
+        </div>
+    </div>
+
+    <!-- 가져오기 모달 -->
+    <div id="importSheet" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white rounded-t-[30px] p-6 transform translate-y-full transition-transform z-[1100] border-t-6 border-black text-black text-left">
+        <h3 class="text-2xl font-black mb-4 text-center">정보 가져오기 ✨</h3>
+        <p class="text-[11px] font-bold text-slate-500 mb-3 text-center leading-tight">카톡방의 정보를 복사한 뒤,<br>아래 버튼을 눌러주세요.</p>
+        <textarea id="importArea" class="import-textarea text-black" placeholder="카톡에서 복사한 내용을 여기에 붙여넣으세요."></textarea>
+        <button onclick="processImportData()" class="w-full py-5 bg-black text-white rounded-2xl font-black text-xl shadow-lg active:scale-95 mb-3">반영하기 🚢</button>
+        <button onclick="window.closeAllModals()" class="w-full py-2 text-slate-400 font-bold text-center block text-black text-center">닫기</button>
+    </div>
+
+    <div id="infoModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[2000] p-6 backdrop-blur-md text-left text-black">
+        <div class="bg-white rounded-[2rem] p-8 w-full max-w-[380px] border-4 border-black shadow-2xl">
+            <h3 id="infoModalTitle" class="text-2xl font-black mb-6 text-center border-b-2 border-black pb-2 text-black text-left">상세 정보</h3>
+            <div id="infoModalContent" class="space-y-3 max-h-[45vh] overflow-y-auto mb-8 text-black text-left text-sm text-black"></div>
+            <div id="linkContainer" class="mb-4"></div>
+            <button onclick="closeInfoModal()" class="w-full py-4 btn-primary rounded-2xl text-xl text-white text-center">닫기</button>
+        </div>
+    </div>
+
+    <div id="nameModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[2000] p-6 backdrop-blur-md text-left text-black">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-[340px] border-4 border-black shadow-2xl">
+            <h3 class="text-xl font-black mb-4 text-center text-black">친구 관리</h3>
+            <div id="nameEditContainer" class="space-y-2 mb-4 max-h-[40vh] overflow-y-auto no-scrollbar text-black text-left text-black"></div>
+            <button onclick="addNewMemberInput()" class="w-full py-2 bg-emerald-50 text-emerald-700 rounded-xl font-black text-xs mb-2 border-2 border-emerald-200">+ 친구 추가</button>
+            <button onclick="applyNameChanges()" class="w-full py-4 btn-primary text-white rounded-xl shadow-lg">모두 저장</button>
+            <button onclick="window.closeAllModals()" class="w-full py-2 text-slate-400 font-black text-center block text-black text-center">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        let year = new Date().getFullYear(), month = new Date().getMonth(), selectedDayKey = '';
+        let tempSelection = { names: [], status: '', place: '', species: '', paidMap: {} };
+        
+        const DB_KEY = 'FISHING_RECORDS_GLOBAL_ELITE_V11';
+        const NAME_KEY = 'FISHING_NAMES_GLOBAL_ELITE_V11';
+        const PB_KEY = 'FISHING_RANK_PB_ELITE_V11';
+
+        let members = JSON.parse(localStorage.getItem(NAME_KEY)) || ['신동일', '한상규', '김헌준', '최성민', '이광윤', '김진원', '김혜진'];
+        let records = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        let pbRecords = JSON.parse(localStorage.getItem(PB_KEY)) || {};
+
+        const persist = () => { localStorage.setItem(DB_KEY, JSON.stringify(records)); localStorage.setItem(NAME_KEY, JSON.stringify(members)); localStorage.setItem(PB_KEY, JSON.stringify(pbRecords)); };
+        const initSelectors = () => { const yS = document.getElementById('yearSelect'), mS = document.getElementById('monthSelect'); if(!yS || !mS) return; yS.innerHTML = ''; mS.innerHTML = ''; for(let y=year-1; y<=year+2; y++) yS.innerHTML += `<option value="${y}" ${y===year?'selected':''}>${y}년</option>`; for(let m=0; m<12; m++) mS.innerHTML += `<option value="${m}" ${m===month?'selected':''}>${m+1}월</option>`; };
+        const jumpDate = () => { year = parseInt(document.getElementById('yearSelect').value); month = parseInt(document.getElementById('monthSelect').value); render(); };
+
+        const render = () => {
+            const grid = document.getElementById('calendar'); if(!grid) return; grid.innerHTML = '';
+            initSelectors();
+            const first = new Date(year, month, 1).getDay(), last = new Date(year, month+1, 0).getDate();
+            const todayK = `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`;
+            for(let i=0; i<first; i++) grid.appendChild(Object.assign(document.createElement('div'), {className:'opacity-0 pointer-events-none'}));
+            for(let d=1; d<=last; d++) {
+                const k = `${year}-${month+1}-${d}`, cell = Object.assign(document.createElement('div'), {className:'day-cell'});
+                if(k === todayK) cell.classList.add('is-today');
+                cell.innerHTML = `<div class="day-number ${new Date(year, month, d).getDay()===0?'day-sun':(new Date(year, month, d).getDay()===6?'day-sat':'')}">${d}</div>`;
+                const info = Object.assign(document.createElement('div'), {className:'flex flex-col gap-0 overflow-hidden text-black text-left'});
+                if(records[k]) {
+                    const names = Object.keys(records[k]).filter(n => !n.startsWith('_'));
+                    if(names.length > 0) {
+                        cell.classList.add('has-record'); 
+                        const firstPerson = names[0], data = records[k][firstPerson];
+                        info.innerHTML = `<div class="fish-badge fish-name">${firstPerson}(${names.length})</div><div class="fish-badge fish-spec">${data.species || '미지정'}</div><div class="fish-badge fish-type">${data.place}</div>`;
+                    }
+                }
+                const tideDiv = Object.assign(document.createElement('div'), {className:'tide-section'});
+                const autoTideNum = (d % 15) || 15; tideDiv.innerHTML = `<div class="weather-summary text-black opacity-30 text-center italic">N/A</div><span class="tide-label font-black text-black text-center block">${autoTideNum}물</span><div class="current-bar-bg opacity-30"><div class="current-bar-fill" style="width:50%"></div></div>`;
+                cell.append(info, tideDiv); cell.onclick = (e) => { e.stopPropagation(); window.openChoiceModal(k, d); }; grid.appendChild(cell);
+            }
+        };
+
+        const calculateAllRanks = () => {
+            const speciesRankMap = {};
+            members.forEach(m => {
+                const pbs = Array.isArray(pbRecords[m]) ? pbRecords[m] : [];
+                pbs.forEach(p => {
+                    if(!p.species) return;
+                    if(!speciesRankMap[p.species]) speciesRankMap[p.species] = [];
+                    const score = (parseFloat(p.length) || 0) * 10000 + (parseFloat(p.weight) || 0) * 100 + (parseFloat(p.count) || 0);
+                    speciesRankMap[p.species].push({ name: m, score, data: p });
+                });
+            });
+            const result = {};
+            for(let s in speciesRankMap) {
+                const sorted = speciesRankMap[s].sort((a,b) => b.score - a.score);
+                sorted.forEach((item, idx) => {
+                    if(!result[item.name]) result[item.name] = [];
+                    const medal = (idx+1) === 1 ? "🥇" : (idx+1) === 2 ? "🥈" : (idx+1) === 3 ? "🥉" : "";
+                    result[item.name].push({ species: s, rank: idx + 1, medal, data: item.data });
+                });
+            }
+            return result;
+        };
+
+        window.updateStats = () => {
+            const container = document.getElementById('statsContainer'); if(!container) return; container.innerHTML = '';
+            const allRanks = calculateAllRanks();
+            members.forEach((name, idx) => {
+                const myRanks = allRanks[name] || [];
+                let boat = 0, walk = 0, farm = 0;
+                for(let k in records) { if(records[k][name]) { const p = records[k][name].place; if(p==='선상') boat++; else if(p==='워킹') walk++; else if(p==='양식장') farm++; } }
+                const rankSummary = myRanks.slice(0,2).map(r => `${r.rank}위${r.medal}${r.species}`).join(', ');
+                container.innerHTML += `
+                    <div class="bg-white p-2.5 rounded-xl border-4 border-black flex flex-col gap-2 shadow-md text-black">
+                        <div class="flex justify-between items-center border-b-2 border-slate-100 pb-1 text-black">
+                            <div class="flex flex-col text-left text-black">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-base text-black">${name}</span>
+                                    <span class="text-[9px] text-blue-600 font-bold">${rankSummary || '기록없음'}</span>
+                                </div>
+                                <span class="text-[8px] font-black text-slate-400 uppercase">출조 ${boat+walk+farm}회</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-black">
+                            <p class="text-[9px] font-black text-black mb-1 text-left">🏆 최고 기록 입력 (PB)</p>
+                            <div class="flex gap-1 mb-1 text-black text-left">
+                                <select id="pb-spec-${name}" class="p-1 bg-white border border-black rounded-lg text-[9px] font-black h-8 w-[60px] text-black">
+                                    <option value="">어종</option>${['우럭','광어','참돔','쭈꾸미','갑오징어','문어','기타'].map(s => `<option value="${s}">${s}</option>`).join('')}
+                                </select>
+                                <div class="record-box flex-1"><input type="number" id="pb-count-${name}" placeholder="0" class="record-input"><span class="text-[6px] opacity-40 font-black">마</span></div>
+                                <div class="record-box flex-1"><input type="number" id="pb-len-${name}" placeholder="0" class="record-input"><span class="text-[6px] opacity-40 font-black">cm</span></div>
+                                <div class="record-box flex-1"><input type="number" id="pb-weight-${name}" placeholder="0" class="record-input"><span class="text-[6px] opacity-40 font-black">kg</span></div>
+                            </div>
+                            <button onclick="window.savePBRecord('${name}')" class="w-full py-1.5 bg-black text-white rounded-lg text-[9px] font-black active:scale-95 shadow-sm text-center">기록 저장 ✨</button>
+                        </div>
+                        <div class="mt-1 grid grid-cols-2 gap-1.5 text-left text-black">
+                            ${myRanks.map(r => `<div class="rank-grid-item"><div class="rank-tag-mini text-black"><span class="text-slate-400 font-black">${r.rank}.</span><span>${r.medal} <b>${r.species}</b></span></div><div class="rank-val-mini">${r.data.length}cm/${r.data.weight}kg/${r.data.count}마리</div></div>`).join('')}
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.savePBRecord = (name) => {
+            const spec = document.getElementById(`pb-spec-${name}`).value, count = document.getElementById(`pb-count-${name}`).value, len = document.getElementById(`pb-len-${name}`).value, weight = document.getElementById(`pb-weight-${name}`).value;
+            if(!spec) return alert("어종을 선택하세요!");
+            if(!Array.isArray(pbRecords[name])) pbRecords[name] = [];
+            const idx = pbRecords[name].findIndex(p => p.species === spec);
+            const data = { species: spec, count: count || 0, length: len || 0, weight: weight || 0 };
+            if(idx > -1) pbRecords[name][idx] = data; else pbRecords[name].push(data);
+            persist(); window.updateStats(); alert("대기록 저장 완료!");
+        };
+
+        window.scrollToPage = (idx) => {
+            const cal = document.getElementById('pageCalendar'), stats = document.getElementById('pageStats');
+            if(idx === 0) { cal.classList.remove('hidden'); stats.classList.add('hidden'); render(); }
+            else { cal.classList.add('hidden'); stats.classList.remove('hidden'); window.updateStats(); }
+            [0, 1].forEach(i => { const t = document.getElementById(`tab${i}`); const d = document.getElementById(`dot${i}`); if(t) t.classList.toggle('nav-active', i===idx); if(d) d.classList.toggle('active', i===idx); });
+        };
+
+        window.closeAllModals = () => {
+            const ids = ['overlay', 'choiceSheet', 'inputSheet', 'importSheet', 'infoModal', 'nameModal'];
+            ids.forEach(id => { const el = document.getElementById(id); if (el) { if (id === 'overlay' || id.includes('Modal')) el.classList.add('hidden'); else el.classList.add('translate-y-full'); } });
+        };
+
+        window.showDayInfo = () => {
+            const content = document.getElementById('infoModalContent'), data = records[selectedDayKey], linkArea = document.getElementById('linkContainer');
+            content.innerHTML = ''; linkArea.innerHTML = '';
+            if(!data) content.innerHTML = '<p class="text-center py-4 text-black text-left">기록 없음</p>';
+            else {
+                const names = Object.keys(data).filter(n => !n.startsWith('_')), first = data[names[0]];
+                content.innerHTML += `<div class="bg-rose-50 p-3 rounded-xl border-2 border-black mb-3 font-black text-black">⚓ ${first.ship || '미정'} / 💰 ${first.fee || '0'}원<br/>🏦 ${first.account || '계좌 정보 없음'}</div>`;
+                names.forEach(n => { const d = data[n]; content.innerHTML += `<div class="p-3 border-2 border-black rounded-xl mb-2 flex justify-between items-center text-black text-left text-black text-left"><div><b>${n}</b><br><small>${d.place} / ${d.species || '미지정'}</small></div><div class="text-xs font-black">선비입금: ${d.paid ? '✅ O' : '❌ X'}</div></div>`; });
+                if(first.link) linkArea.innerHTML = `<a href="${first.link}" target="_blank" class="block w-full py-4 bg-blue-600 text-white text-center rounded-xl font-black text-lg shadow-md active:scale-95 transition-all">🔗 예약 사이트 바로가기</a>`;
+            }
+            document.getElementById('infoModal').classList.remove('hidden');
+        };
+
+        window.goToSetup = (isUpdate = false) => { 
+            document.getElementById('choiceSheet').classList.add('translate-y-full'); 
+            setTimeout(() => {
+                document.getElementById('inputSheet').classList.remove('translate-y-full');
+                const container = document.getElementById('modalNameList'), payContainer = document.getElementById('paymentList');
+                container.innerHTML = ''; payContainer.innerHTML = '';
+                const dayData = records[selectedDayKey] || {}, selectedNames = Object.keys(dayData).filter(n => !n.startsWith('_'));
+                if(isUpdate && selectedNames.length > 0) {
+                    tempSelection.names = [...selectedNames]; const d = dayData[selectedNames[0]]; tempSelection.status = d.status; tempSelection.place = d.place;
+                    document.getElementById('modalSpecies').value = d.species || ""; document.getElementById('modalLink').value = d.link || ""; document.getElementById('modalShip').value = d.ship || ""; document.getElementById('modalFee').value = d.fee || ""; document.getElementById('modalAccount').value = d.account || "";
+                    tempSelection.paidMap = {}; selectedNames.forEach(n => tempSelection.paidMap[n] = dayData[n].paid);
+                } else {
+                    tempSelection = { names: [], status: '', place: '', species: '', paidMap: {} };
+                    document.getElementById('modalLink').value = ""; document.getElementById('modalShip').value = ""; document.getElementById('modalFee').value = ""; document.getElementById('modalAccount').value = ""; document.getElementById('modalSpecies').value = "";
+                }
+                members.forEach(m => {
+                    const btn = Object.assign(document.createElement('button'), {className: "p-2 border-2 border-black rounded-xl text-[10px] font-black bg-white text-black truncate", innerText: m});
+                    if(tempSelection.names.includes(m)) btn.classList.add('active-selection');
+                    btn.onclick = () => { if(tempSelection.names.includes(m)) { tempSelection.names = tempSelection.names.filter(n => n !== m); btn.classList.remove('active-selection'); delete tempSelection.paidMap[m]; } else { tempSelection.names.push(m); btn.classList.add('active-selection'); tempSelection.paidMap[m] = false; } refreshPaymentList(); };
+                    container.appendChild(btn);
+                });
+                refreshPaymentList(); updateSelectionUI();
+            }, 200); 
+        };
+
+        function refreshPaymentList() {
+            const list = document.getElementById('paymentList'); if(!list) return; list.innerHTML = '';
+            if(tempSelection.names.length > 0) {
+                document.getElementById('paymentSection').classList.remove('hidden');
+                tempSelection.names.forEach(n => { const div = document.createElement('div'); div.className = "payment-check text-black text-left"; div.innerHTML = `<input type="checkbox" id="pay-${n}" ${tempSelection.paidMap[n] ? 'checked' : ''} onchange="tempSelection.paidMap['${n}'] = this.checked"> <label for="pay-${n}">${n} 선비 입금 완료</label>`; list.appendChild(div); });
+            } else { document.getElementById('paymentSection').classList.add('hidden'); }
+        }
+
+        window.updateSelectionUI = () => { document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active-selection', b.innerText === tempSelection.status)); document.querySelectorAll('.place-btn').forEach(b => b.classList.toggle('active-selection', b.innerText === tempSelection.place)); };
+        window.selectStatus = (s) => { tempSelection.status = s; updateSelectionUI(); };
+        window.selectPlace = (p) => { tempSelection.place = p; updateSelectionUI(); };
+        window.saveAndExit = () => { 
+            if(tempSelection.names.length === 0 || !tempSelection.status) return alert('참가자와 상태를 선택하세요.'); 
+            const meta = {}; if(records[selectedDayKey]) Object.keys(records[selectedDayKey]).forEach(k => { if(k.startsWith('_')) meta[k] = records[selectedDayKey][k]; });
+            records[selectedDayKey] = { ...meta };
+            const ship = document.getElementById('modalShip').value, fee = document.getElementById('modalFee').value, acc = document.getElementById('modalAccount').value, link = document.getElementById('modalLink').value, spec = document.getElementById('modalSpecies').value;
+            tempSelection.names.forEach(n => { records[selectedDayKey][n] = { status: tempSelection.status, place: tempSelection.place, species: spec, link, ship, fee, account: acc, paid: tempSelection.paidMap[n] }; }); 
+            persist(); render(); window.closeAllModals(); 
+        };
+
+        // 카카오톡 바로가기 내보내기 (모바일 공유 시트 호출)
+        window.exportToKakao = async () => {
+            const dayData = records[selectedDayKey]; if(!dayData) return;
+            const tripMembers = Object.keys(dayData).filter(n => !n.startsWith('_')), first = dayData[tripMembers[0]], allRanks = calculateAllRanks();
+            
+            let text = `[FISHING LIFE 출조 및 전체 랭킹]\n━━━━━━━━━━━━━━━━━━━━\n📅 날짜: ${selectedDayKey}\n🚢 배이름: ${first.ship || '-'}\n💰 선비: ${first.fee || '0'}원\n🏦 계좌: ${first.account || '-'}\n👥 명단: ${tripMembers.join(', ')}\n🎯 어종: ${first.species || '-'}\n━━━━━━━━━━━━━━━━━━━━\n\n🏆 실시간 전체 랭킹\n`;
+            
+            members.forEach(m => {
+                const myRanks = allRanks[m] || [];
+                if(myRanks.length > 0) {
+                    const rankStr = myRanks.map(r => `${r.species}(${r.rank}위${r.medal})`).join(', ');
+                    text += `- ${m}: ${rankStr}\n`;
+                } else { text += `- ${m}: 기록없음\n`; }
+            });
+
+            // 스마트폰의 네이티브 공유 API 호출 (카카오톡 선택 가능)
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: `피싱라이프_${selectedDayKey}`,
+                        text: text
+                    });
+                } catch (err) {
+                    // 공유 취소 시 아무 동작 안함
+                }
+            } else {
+                // PC 브라우저 등 미지원 시 클립보드 복사로 대체
+                const dummy = document.createElement("textarea"); document.body.appendChild(dummy); dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
+                alert("공유 API를 지원하지 않는 브라우저입니다. 텍스트가 클립보드에 복사되었습니다. 카톡에 붙여넣으세요!");
+            }
+        };
+
+        window.openImportModal = () => { document.getElementById('importArea').value = ""; document.getElementById('overlay').classList.remove('hidden'); setTimeout(() => { document.getElementById('importSheet').classList.remove('translate-y-full'); }, 10); };
+        window.processImportData = () => {
+            const val = document.getElementById('importArea').value.trim(); if(!val) return alert("텍스트를 입력해주세요.");
+            try {
+                const lines = val.split('\n'); let dateStr = "", ship = "", fee = "", account = "", names = [], spec = "";
+                lines.forEach(l => {
+                    if(l.includes("날짜:")) dateStr = l.split("날짜:")[1].trim();
+                    if(l.includes("배이름:")) ship = l.split("배이름:")[1].trim();
+                    if(l.includes("선비:")) fee = l.split("선비:")[1].trim();
+                    if(l.includes("계좌:")) account = l.split("계좌:")[1].trim();
+                    if(l.includes("명단:")) names = l.split("명단:")[1].trim().split(',').map(s => s.trim());
+                    if(l.includes("어종:")) spec = l.split("어종:")[1].trim();
+                });
+                if(!dateStr || names.length === 0) return alert("형식이 올바르지 않습니다.");
+                if(!records[dateStr]) records[dateStr] = {};
+                names.forEach(n => { records[dateStr][n] = { status: '출조', place: '선상', species: spec, link: '', ship, fee, account, paid: false }; });
+                persist(); render(); window.closeAllModals(); alert(`${dateStr} 일정 등록 완료!`);
+            } catch(e) { alert("가져오기 실패"); }
+        };
+        window.openChoiceModal = (k, d) => { selectedDayKey = k; document.getElementById('choiceDateTitle').innerText = `${month+1}/${d} Action`; document.getElementById('overlay').classList.remove('hidden'); document.getElementById('choiceSheet').classList.remove('translate-y-full'); };
+        window.closeInfoModal = () => document.getElementById('infoModal').classList.add('hidden');
+        window.triggerClearDate = () => { if(confirm('기록을 삭제할까요?')) { delete records[selectedDayKey]; persist(); render(); window.closeAllModals(); } };
+        window.triggerResetAll = () => { if(confirm('전체 초기화하시겠습니까?')) { records = {}; pbRecords = {}; persist(); render(); } };
+        window.triggerClearUserPB = (name) => { if(confirm(`${name}님의 모든 기록을 삭제할까요?`)) { delete pbRecords[name]; persist(); window.updateStats(); } };
+        window.openNameSettings = () => { const c = document.getElementById('nameEditContainer'); if(!c) return; c.innerHTML = ''; members.forEach((m, i) => { c.innerHTML += `<div><label class="text-[10px] font-black text-black text-left">NO.${i+1}</label><input type="text" value="${m}" class="name-edit-input w-full px-4 py-2 border-2 border-black rounded-xl font-black text-black text-left text-black"></div>`; }); document.getElementById('overlay').classList.remove('hidden'); document.getElementById('nameModal').classList.remove('hidden'); };
+        window.addNewMemberInput = () => { const c = document.getElementById('nameEditContainer'); if(!c) return; const div = document.createElement('div'); div.innerHTML = `<label class="text-[10px] font-black text-left text-black text-black">NEW</label><input type="text" placeholder="새 이름" class="name-edit-input w-full px-4 py-2 border-2 border-black rounded-xl font-black text-black text-left text-black">`; c.appendChild(div); c.scrollTop = c.scrollHeight; };
+        window.applyNameChanges = () => { members = Array.from(document.querySelectorAll('.name-edit-input')).map(i => i.value.trim()).filter(v => v); persist(); render(); closeAllModals(); };
+        window.refreshLiveInfo = () => { render(); alert("동기화 완료"); };
+        render();
+    </script>
+</body>
+</html>
