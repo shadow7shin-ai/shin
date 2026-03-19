@@ -1,30 +1,32 @@
 {
-  "name": "피싱 라이프 Elite",
-  "short_name": "FishingLife",
-  "description": "스마트 낚시 출조 및 전체 랭킹 관리 시스템 v3.1.0",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#064e3b",
-  "orientation": "portrait",
+  "short_name": "FISHING LIFE",
+  "name": "FISHING LIFE 2025 - Nano Banana Pro Edition",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3061/3061805.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://placehold.co/192x192/0891b2/ffffff?text=FL",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0891b2",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "description": "2025년 출조 일정 관리 및 조과 기록 랭킹 시스템",
+  "screenshots": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
-      "sizes": "512x512",
+      "src": "https://placehold.co/430x932/0a0c10/ffffff?text=FISHING+LIFE+UI",
+      "sizes": "430x932",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "form_factor": "narrow",
+      "label": "Home Screen"
     }
   ]
 }
