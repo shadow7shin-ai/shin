@@ -1,7 +1,7 @@
 {
   "name": "피싱 라이프 Elite",
   "short_name": "FishingLife",
-  "description": "스마트 낚시 출조 및 전체 랭킹 관리 시스템 v3.0.0",
+  "description": "스마트 낚시 출조 및 전체 랭킹 관리 시스템 v3.1.0",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,19 +9,19 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2830/2830114.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2830/2830114.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2830/2830114.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3264/3264906.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
