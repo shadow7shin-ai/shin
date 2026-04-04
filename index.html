@@ -90,7 +90,12 @@
             "2025-1-1": "신정", "2025-1-28": "설날", "2025-1-29": "설날", "2025-1-30": "설날",
             "2025-3-1": "삼일절", "2025-3-3": "대체휴무", "2025-5-5": "어린이날", "2025-5-6": "부처님오신날",
             "2025-6-6": "현충일", "2025-8-15": "광복절", "2025-10-3": "개천절", "2025-10-5": "추석",
-            "2025-10-6": "추석", "2025-10-7": "추석", "2025-10-8": "대체휴무", "2025-10-9": "한글날", "2025-12-25": "성탄절"
+            "2025-10-6": "추석", "2025-10-7": "추석", "2025-10-8": "대체휴무", "2025-10-9": "한글날", "2025-12-25": "성탄절",
+            "2026-1-1": "신정", "2026-2-16": "설날", "2026-2-17": "설날", "2026-2-18": "설날",
+            "2026-3-1": "삼일절", "2026-3-2": "대체휴무", "2026-5-5": "어린이날", "2026-5-24": "부처님오신날",
+            "2026-5-25": "대체휴무", "2026-6-6": "현충일", "2026-8-15": "광복절", "2026-8-17": "대체휴무",
+            "2026-9-24": "추석", "2026-9-25": "추석", "2026-9-26": "추석", "2026-10-3": "개천절", "2026-10-5": "대체휴무",
+            "2026-10-9": "한글날", "2026-12-25": "성탄절"
         };
 
         const App = () => {
@@ -441,6 +446,9 @@
                 showAlert("복사 완료", "카톡에 정보를 공유하세요.");
             };
 
+            const today = new Date();
+            const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+
             if (!isAuthReady) return <div className="h-full w-full flex flex-col items-center justify-center bg-[#0a0c10] text-cyan-500 font-black italic animate-pulse text-xl">FISHING LIFE READY...</div>;
 
             return (
@@ -473,12 +481,13 @@
                                         const isSat = idx % 7 === 6;
                                         const hol = HOLIDAYS[cell.key];
                                         const tide = getTideValue(cell.key);
+                                        const isToday = cell.key === todayKey;
                                         return (
                                             <div key={idx} className="day-cell relative text-black leading-none">
                                                 {cell.type === 'day' && (
-                                                    <button onClick={() => { setSelectedDayKey(cell.key); setModalType('choice'); }} className={`w-full h-full rounded-xl border flex flex-col p-1.5 transition-all active:scale-95 overflow-hidden shadow-sm ${cell.data ? 'bg-white border-rose-500 ring-2 ring-rose-50 shadow-md' : 'bg-white/60 border-slate-50'}`}>
+                                                    <button onClick={() => { setSelectedDayKey(cell.key); setModalType('choice'); }} className={`w-full h-full rounded-xl border flex flex-col p-1.5 transition-all active:scale-95 overflow-hidden shadow-sm ${cell.data ? 'bg-white border-rose-500 ring-2 ring-rose-50' : 'bg-white/60 border-slate-50'} ${isToday ? 'ring-2 ring-cyan-500' : ''}`}>
                                                         <div className="flex justify-between items-start mb-1 text-black font-black w-full">
-                                                            <span className={`text-[12px] font-black ${isSun || hol ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-900'}`}>{cell.day}</span>
+                                                            <span className={`text-[12px] font-black ${isToday ? 'bg-cyan-500 text-white px-1.5 rounded-md shadow-sm' : (isSun || hol ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-900')}`}>{cell.day}</span>
                                                             {hol && <span className="text-[6px] font-black text-rose-400 truncate max-w-[25px]">{hol}</span>}
                                                         </div>
                                                         {cell.data ? (
