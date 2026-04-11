@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>FISHING LIFE 2025</title>
     
-    <!-- Libraries -->
+    <!-- PWA 및 모바일 최적화 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0891b2">
+    
+    <!-- 라이브러리 로드 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -14,40 +18,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #000;
-            margin: 0; padding: 0;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #root { 
-            height: 100dvh; width: 100%; 
-            display: flex; justify-content: center; align-items: center;
-        }
-        .app-container {
-            width: 100%; max-width: 430px; 
-            height: 100dvh; background-color: #fff;
-            position: relative; display: flex; flex-direction: column;
-            overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #000; margin: 0; padding: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        #root { height: 100dvh; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .app-container { width: 100%; max-width: 430px; height: 100dvh; background-color: #fff; position: relative; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .holiday-text { color: #f87171 !important; font-weight: 900 !important; }
         .saturday-text { color: #60a5fa !important; }
-
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        
-        /* 캘린더 날짜 칸 높이를 조절하여 한 화면에 잘 나오도록 변경 */
+        /* 달력 크기 최적화 (한 화면에 다 나오도록) */
         .day-cell { min-height: 60px; height: 10.5vh; max-height: 85px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
@@ -76,26 +62,16 @@
                 Alert: <Fragment><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></Fragment>,
                 Share: <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>,
                 Ship: <path d="M2 21c.6.5 1.2 1 2.5 1s2.5-.5 3.5-1c1-.5 2.1-1 3.5-1s2.5.5 3.5 1c1 .5 2.1 1 3.5 1s2.5-.5 3.5-1M19.38 20.51l1.54-5.38A2 2 0 0 0 18.99 12H13V3l-9 6v3h3.5a2 2 0 0 0 1.93 1.51l.46 2.49"/>,
-                Link: <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>,
-                Check: <path d="M20 6 9 17l-5-5"/>
+                Link: <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
             };
             return (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
-                    {icons[name]}
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>{icons[name]}</svg>
             );
         };
 
         const HOLIDAYS = {
-            "2025-1-1": "신정", "2025-1-28": "설날", "2025-1-29": "설날", "2025-1-30": "설날",
-            "2025-3-1": "삼일절", "2025-3-3": "대체휴무", "2025-5-5": "어린이날", "2025-5-6": "부처님오신날",
-            "2025-6-6": "현충일", "2025-8-15": "광복절", "2025-10-3": "개천절", "2025-10-5": "추석",
-            "2025-10-6": "추석", "2025-10-7": "추석", "2025-10-8": "대체휴무", "2025-10-9": "한글날", "2025-12-25": "성탄절",
-            "2026-1-1": "신정", "2026-2-16": "설날", "2026-2-17": "설날", "2026-2-18": "설날",
-            "2026-3-1": "삼일절", "2026-3-2": "대체휴무", "2026-5-5": "어린이날", "2026-5-24": "부처님오신날",
-            "2026-5-25": "대체휴무", "2026-6-6": "현충일", "2026-8-15": "광복절", "2026-8-17": "대체휴무",
-            "2026-9-24": "추석", "2026-9-25": "추석", "2026-9-26": "추석", "2026-10-3": "개천절", "2026-10-5": "대체휴무",
-            "2026-10-9": "한글날", "2026-12-25": "성탄절"
+            "2025-1-1": "신정", "2025-1-28": "설날", "2025-1-29": "설날", "2025-1-30": "설날", "2025-3-1": "삼일절", "2025-3-3": "대체휴무", "2025-5-5": "어린이날", "2025-5-6": "부처님오신날", "2025-6-6": "현충일", "2025-8-15": "광복절", "2025-10-3": "개천절", "2025-10-5": "추석", "2025-10-6": "추석", "2025-10-7": "추석", "2025-10-8": "대체휴무", "2025-10-9": "한글날", "2025-12-25": "성탄절",
+            "2026-1-1": "신정", "2026-2-16": "설날", "2026-2-17": "설날", "2026-2-18": "설날", "2026-3-1": "삼일절", "2026-3-2": "대체휴무", "2026-5-5": "어린이날", "2026-5-24": "부처님오신날", "2026-5-25": "대체휴무", "2026-6-6": "현충일", "2026-8-15": "광복절", "2026-8-17": "대체휴무", "2026-9-24": "추석", "2026-9-25": "추석", "2026-9-26": "추석", "2026-10-3": "개천절", "2026-10-5": "대체휴무", "2026-10-9": "한글날", "2026-12-25": "성탄절"
         };
 
         const App = () => {
@@ -115,11 +91,11 @@
                 ship: '', fee: '', account: '', link: '', paidMap: {}
             });
 
-            // 새로운 상태: 현황 필터 및 어종 직접입력 관리
+            // 현황 필터 및 어종 직접 입력 상태 관리
             const [statsFilterSpecies, setStatsFilterSpecies] = useState('전체');
             const [customSpeciesInputs, setCustomSpeciesInputs] = useState({});
 
-            // 스마트폰 스와이프 처리를 위한 상태 변수
+            // 모바일 스와이프 처리를 위한 상태
             const [touchStartX, setTouchStartX] = useState(null);
             const [touchStartY, setTouchStartY] = useState(null);
             const [touchEndX, setTouchEndX] = useState(null);
@@ -157,19 +133,18 @@
                 });
             }, [members, rankingData]);
 
-            // 필터링용 등록된 전체 어종 추출 및 출력 대상 회원 정렬
+            // 필터링용 전체 등록 어종 추출 (2040년 로직 등 모든 데이터에 반응)
             const allAvailableSpecies = useMemo(() => {
                 const s = new Set();
-                members.forEach(m => {
-                    (pbRecords[m]?.list || []).forEach(r => s.add(r.species));
-                });
+                members.forEach(m => { (pbRecords[m]?.list || []).forEach(r => s.add(r.species)); });
                 return Array.from(s);
             }, [members, pbRecords]);
 
+            // 어종 선택 시 해당 어종 랭커만 순위대로 정렬하여 표출
             const displayMembers = useMemo(() => {
                 if (statsFilterSpecies === '전체') return sortedMembers;
                 const sr = rankingData.specRanks[statsFilterSpecies] || [];
-                return sr.map(x => x.name); // 필터링 시 해당 어종의 순위대로 자동 정렬됨
+                return sr.sort((a,b) => a.rank - b.rank).map(x => x.name);
             }, [sortedMembers, statsFilterSpecies, rankingData]);
 
             const calendarCells = useMemo(() => {
@@ -184,33 +159,29 @@
                 return c;
             }, [currentDate, records]);
 
-            // 로컬 스토리지(HTML) 및 Firebase 초기화
+            // 로컬 스토리지 및 Firebase 초기화 보정
             useEffect(() => {
                 const init = async () => {
                     if (!window.FBASE_LIB || !window.FBASE_CONFIG) return;
                     const { FBASE_LIB, FBASE_CONFIG } = window;
-                    
                     const defaultMembers = ['신동일', '한상규', '김헌준', '최성민', '이광윤', '김진원', '김혜진'];
 
-                    // HTML 환경에서 DB가 없을 경우 로컬 스토리지 연동
+                    // 외부 HTML 로컬 실행 환경 (Firebase Key 없음)
                     if (!FBASE_CONFIG.config.apiKey) {
                         let localMembers = JSON.parse(localStorage.getItem('FL_MEMBERS'));
-                        // 로컬 스토리지에 멤버가 없으면 기본 멤버로 복구 및 저장
                         if (!localMembers || localMembers.length === 0) {
                             localMembers = defaultMembers;
                             localStorage.setItem('FL_MEMBERS', JSON.stringify(localMembers));
                         }
-                        
                         const localRecords = JSON.parse(localStorage.getItem('FL_SCHEDULES')) || {};
                         const localPb = JSON.parse(localStorage.getItem('FL_RANKINGS')) || {};
                         
-                        setMembers(localMembers);
-                        setRecords(localRecords);
-                        setPbRecords(localPb);
+                        setMembers(localMembers); setRecords(localRecords); setPbRecords(localPb);
                         setIsAuthReady(true);
                         return;
                     }
 
+                    // 클라우드 Firebase 연동
                     const fbApp = FBASE_LIB.initializeApp(FBASE_CONFIG.config);
                     const auth = FBASE_LIB.getAuth(fbApp);
                     const db = FBASE_LIB.getFirestore(fbApp);
@@ -218,25 +189,16 @@
                     FBASE_LIB.onAuthStateChanged(auth, async (user) => {
                         if (user) {
                             const baseCol = `/artifacts/${FBASE_CONFIG.id}/public/data`;
-                            
                             FBASE_LIB.onSnapshot(FBASE_LIB.doc(db, `${baseCol}/config`, 'members'), (s) => {
                                 const data = s.data();
-                                // DB에 멤버가 없으면 기본 멤버로 복구
-                                if (s.exists() && data && data.list && data.list.length > 0) {
-                                    setMembers(data.list);
-                                } else {
-                                    FBASE_LIB.setDoc(FBASE_LIB.doc(db, `${baseCol}/config`, 'members'), { list: defaultMembers });
-                                    setMembers(defaultMembers);
-                                }
+                                if (s.exists() && data && data.list && data.list.length > 0) setMembers(data.list);
+                                else { FBASE_LIB.setDoc(FBASE_LIB.doc(db, `${baseCol}/config`, 'members'), { list: defaultMembers }); setMembers(defaultMembers); }
                             });
-                            
                             FBASE_LIB.onSnapshot(FBASE_LIB.collection(db, `${baseCol}/schedules`), (s) => {
-                                const r = {}; s.forEach(d => r[d.id] = d.data());
-                                setRecords(r);
+                                const r = {}; s.forEach(d => r[d.id] = d.data()); setRecords(r);
                             });
                             FBASE_LIB.onSnapshot(FBASE_LIB.collection(db, `${baseCol}/rankings`), (s) => {
-                                const p = {}; s.forEach(d => p[d.id] = d.data());
-                                setPbRecords(p);
+                                const p = {}; s.forEach(d => p[d.id] = d.data()); setPbRecords(p);
                             });
                             setIsAuthReady(true);
                         } else {
@@ -249,35 +211,26 @@
                 else window.addEventListener('fbase-ready-init', init);
             }, []);
 
+            // 물때 정확도 계산 (2040년까지 지원)
             const getTideValue = (dateKey) => {
                 if (!dateKey) return "1물";
                 const parts = dateKey.split('-');
                 const targetTime = new Date(parts[0], parts[1] - 1, parts[2]).getTime();
                 
-                // 2024년 말 ~ 2027년 초까지의 정확한 음력 1일(합삭) 데이터 기반
-                const newMoons = [
-                    "2024-12-01", "2024-12-31", "2025-01-29", "2025-02-28", "2025-03-29",
-                    "2025-04-28", "2025-05-27", "2025-06-25", "2025-07-25", "2025-08-23",
-                    "2025-09-22", "2025-10-21", "2025-11-20", "2025-12-20", "2026-01-19",
-                    "2026-02-17", "2026-03-19", "2026-04-17", "2026-05-16", "2026-06-15",
-                    "2026-07-14", "2026-08-13", "2026-09-11", "2026-10-11", "2026-11-09",
-                    "2026-12-09", "2027-01-08"
-                ].map(d => new Date(d).getTime());
-
-                let prevNewMoon = newMoons[0];
-                for (let i = 0; i < newMoons.length; i++) {
-                    if (newMoons[i] <= targetTime) {
-                        prevNewMoon = newMoons[i];
-                    } else {
-                        break;
-                    }
+                // 기준일(2024년 12월 1일) 기반의 평균 삭망월 주기를 이용한 2040년까지의 계산법
+                const baseNewMoon = new Date(2024, 11, 1).getTime(); // 2024-12-01 (Month index 11)
+                const lunarMonthMs = 29.530588 * 24 * 60 * 60 * 1000;
+                let diffDays;
+                
+                if (targetTime >= baseNewMoon) {
+                    const diffMs = targetTime - baseNewMoon;
+                    diffDays = Math.floor((diffMs % lunarMonthMs) / (1000 * 60 * 60 * 24));
+                } else {
+                    const diffMs = baseNewMoon - targetTime;
+                    diffDays = Math.floor((lunarMonthMs - (diffMs % lunarMonthMs)) / (1000 * 60 * 60 * 24));
                 }
                 
-                // 해당 날짜가 음력 며칠인지 계산
-                const diffDays = Math.floor((targetTime - prevNewMoon) / (1000 * 60 * 60 * 24));
-                const lunarDay = diffDays + 1; // 음력 1일부터 시작
-                
-                // 한국 서해안 표준 물때 계산식
+                const lunarDay = diffDays + 1;
                 const tideMap = ["7물", "8물", "9물", "10물", "11물", "12물", "13물", "조금", "무시", "1물", "2물", "3물", "4물", "5물", "6물"];
                 return tideMap[lunarDay % 15];
             };
@@ -285,6 +238,7 @@
             const closeModals = () => { setModalType(null); setAlertConfig({show:false}); };
             const showAlert = (t, m, c = null) => setAlertConfig({ show: true, title: t, message: m, onConfirm: c });
 
+            // 일정 기능
             const saveSchedule = async () => {
                 if (!selectedDayKey) return;
                 const { FBASE_LIB, FBASE_CONFIG } = window;
@@ -300,7 +254,6 @@
                     }; 
                 });
 
-                // HTML 로컬 스토리지에 영구 저장
                 if (!FBASE_CONFIG.config.apiKey) {
                     setRecords(prev => {
                         const next = {...prev, [selectedDayKey]: dayData};
@@ -309,7 +262,6 @@
                     });
                     return closeModals();
                 }
-
                 const db = FBASE_LIB.getFirestore();
                 await FBASE_LIB.setDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/schedules`, selectedDayKey), dayData);
                 closeModals();
@@ -318,11 +270,9 @@
             const deleteSchedule = () => {
                 showAlert("삭제", "해당 일정을 지울까요?", async () => {
                     const { FBASE_LIB, FBASE_CONFIG } = window;
-                    // HTML 로컬 환경 데이터 삭제 반영
                     if (!FBASE_CONFIG.config.apiKey) {
                         setRecords(prev => { 
-                            const next = {...prev}; 
-                            delete next[selectedDayKey]; 
+                            const next = {...prev}; delete next[selectedDayKey]; 
                             localStorage.setItem('FL_SCHEDULES', JSON.stringify(next));
                             return next; 
                         });
@@ -337,25 +287,22 @@
             const triggerResetAll = () => {
                 showAlert("초기화", "데이터를 모두 지울까요?", async () => {
                     const { FBASE_LIB, FBASE_CONFIG } = window;
-                    // HTML 로컬 환경 초기화 반영
                     if (!FBASE_CONFIG.config.apiKey) {
-                        setRecords({});
-                        localStorage.removeItem('FL_SCHEDULES');
+                        setRecords({}); localStorage.removeItem('FL_SCHEDULES');
                         return closeModals();
                     }
                     const db = FBASE_LIB.getFirestore();
                     const snap = await FBASE_LIB.getDocs(FBASE_LIB.collection(db, `/artifacts/${FBASE_CONFIG.id}/public/data/schedules`));
-                    snap.forEach(async (d) => {
-                        await FBASE_LIB.deleteDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/schedules`, d.id));
-                    });
+                    snap.forEach(async (d) => { await FBASE_LIB.deleteDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/schedules`, d.id)); });
                     closeModals();
                 });
             };
 
+            // 랭킹(현황) 저장 - 어종 직접입력 완벽 대응
             const savePB = async (name) => {
                 const { FBASE_LIB, FBASE_CONFIG } = window;
-                
                 let s = "";
+                
                 if (customSpeciesInputs[name]) {
                     s = document.getElementById(`pb-custom-s-${name}`)?.value?.trim();
                 } else {
@@ -365,12 +312,11 @@
                 const c = Number(document.getElementById(`pb-c-${name}`).value) || 0;
                 const l = Number(document.getElementById(`pb-l-${name}`).value) || 0;
                 
-                if (!s) return showAlert("경고", "어종을 입력/선택해주세요.");
+                if (!s || s === '기타') return showAlert("경고", "어종을 정확히 입력해주세요.");
                 
                 const list = pbRecords[name]?.list || [];
                 const updated = [...list.filter(x => x.species !== s), { species: s, count: c, length: l }];
                 
-                // HTML 로컬 환경 랭킹 저장 반영
                 if (!FBASE_CONFIG.config.apiKey) {
                     setPbRecords(prev => {
                         const next = {...prev, [name]: { list: updated }};
@@ -391,7 +337,6 @@
                 showAlert("기록 삭제", `${spec} 기록을 지울까요?`, async () => {
                     const { FBASE_LIB, FBASE_CONFIG } = window;
                     const updated = (pbRecords[name]?.list || []).filter(p => p.species !== spec);
-                    // HTML 로컬 환경 랭킹 삭제 반영
                     if (!FBASE_CONFIG.config.apiKey) {
                         setPbRecords(prev => {
                             const next = {...prev, [name]: { list: updated }};
@@ -414,12 +359,12 @@
                 try {
                     const lines = importText.split('\n');
 
-                    // --- 현황(크루 현황) 데이터 가져오기 전용 파싱 ---
+                    // 크루 현황 데이터 파서
                     if (importText.includes("크루 현황")) {
                         let currentName = "";
+                        const parsedData = {}; // 모든 크루의 데이터를 임시 저장할 객체
                         for (let line of lines) {
                             const l = line.trim();
-                            
                             const nameMatch = l.match(/^\d+위:\s+([^\(]+)/);
                             if (nameMatch) {
                                 currentName = nameMatch[1].trim();
@@ -427,7 +372,6 @@
                                 const recPart = l.replace("└", "").trim();
                                 const items = recPart.split(",");
                                 const newList = [];
-                                
                                 items.forEach(item => {
                                     const match = item.match(/(.+)\((.+)\)/);
                                     if(match) {
@@ -440,26 +384,32 @@
                                         newList.push({ species: sn, length: vl, count: vc, weight: vw });
                                     }
                                 });
-                                
                                 if(newList.length > 0) {
-                                    if (isLocal) {
-                                        setPbRecords(prev => {
-                                            const next = {...prev, [currentName]: {list: newList}};
-                                            localStorage.setItem('FL_RANKINGS', JSON.stringify(next));
-                                            return next;
-                                        });
-                                    } else {
-                                        await FBASE_LIB.setDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/rankings`, currentName), { list: newList });
-                                    }
+                                    parsedData[currentName] = { list: newList };
                                 }
                             }
                         }
+                        
+                        // 파싱된 모든 데이터를 한 번에 상태와 저장소에 업데이트
+                        if (Object.keys(parsedData).length > 0) {
+                            if (isLocal) {
+                                setPbRecords(prev => {
+                                    const next = { ...prev, ...parsedData };
+                                    localStorage.setItem('FL_RANKINGS', JSON.stringify(next));
+                                    return next;
+                                });
+                            } else {
+                                const promises = Object.keys(parsedData).map(name => {
+                                    return FBASE_LIB.setDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/rankings`, name), parsedData[name]);
+                                });
+                                await Promise.all(promises);
+                            }
+                        }
                         setImportText(''); closeModals();
-                        showAlert("성공", "현황 데이터가 정상적으로 복원되었습니다.");
-                        return; // 파싱 완료 후 종료
+                        return showAlert("성공", "현황 데이터가 정상적으로 복원되었습니다.");
                     }
 
-                    // --- 기존 출조 일정 파싱 로직 유지 ---
+                    // 일정 데이터 파서
                     let dK = "", sN = "", f = "", a = "", names = [], spec = "", lk = "", pl = "선상", st = "출조";
                     let pM = {};
 
@@ -479,48 +429,14 @@
                                 if(!clean) return;
                                 const isP = clean.includes("(완료)");
                                 const nOnly = clean.replace("(완료)","").replace("(미입금)","").trim();
-                                names.push(nOnly); 
-                                pM[nOnly] = isP;
+                                names.push(nOnly); pM[nOnly] = isP;
                             });
-                        }
-                        if(l.startsWith("- ") && l.includes(":")) {
-                            const content = l.substring(2);
-                            const nPart = content.split(":")[0].trim();
-                            const recPart = content.split(":")[1]?.trim();
-                            if(recPart && recPart.includes("(")) {
-                               const items = recPart.split(",");
-                               const newList = [];
-                               items.forEach(item => {
-                                  const match = item.match(/(.+)\((.+)\)/);
-                                  if(match) {
-                                      const sn = match[1].trim(); 
-                                      const detail = match[2].trim();
-                                      let vl=0, vc=0;
-                                      if(detail.includes("cm")) vl = parseFloat(detail) || 0;
-                                      else if(detail.includes("마리")) vc = parseInt(detail) || 0;
-                                      newList.push({ species: sn, length: vl, count: vc });
-                                  }
-                               });
-                               if(newList.length > 0) {
-                                   // HTML 환경 가져오기 로컬 저장 반영
-                                   if (isLocal) {
-                                       setPbRecords(prev => {
-                                           const next = {...prev, [nPart]: {list: newList}};
-                                           localStorage.setItem('FL_RANKINGS', JSON.stringify(next));
-                                           return next;
-                                       });
-                                   } else {
-                                       await FBASE_LIB.setDoc(FBASE_LIB.doc(db, `/artifacts/${FBASE_CONFIG.id}/public/data/rankings`, nPart), { list: newList });
-                                   }
-                               }
-                            }
                         }
                     }
                     if(!dK || names.length === 0) throw new Error();
                     const dayData = {};
                     names.forEach(n => { dayData[n] = { names, status: st, place: pl, species: spec, ship: sN, fee: f, account: a, link: lk, paid: pM[n]||false }; });
                     
-                    // HTML 환경 스케줄 로컬 저장 반영
                     if (isLocal) {
                         setRecords(prev => {
                             const next = {...prev, [dK]: dayData};
@@ -541,17 +457,9 @@
                 const ns = Object.keys(d);
                 const f = d[ns[0]];
                 const nList = ns.map(n => `${n}${d[n].paid ? '(완료)' : '(미입금)'}`).join(', ');
-                let pbT = "\n\n🏆 실시간 개인 최고 기록\n━━━━━━━━━━━━\n";
-                members.forEach(m => {
-                    const l = pbRecords[m]?.list || [];
-                    if(l.length > 0) {
-                        const its = l.map(x => `${x.species}(${x.count>0?x.count+'마리':x.length>0?x.length+'cm':x.weight+'kg'})`).join(', ');
-                        pbT += `- ${m}: ${its}\n`;
-                    }
-                });
-                const text = `[FISHING LIFE 2025]\n━━━━━━━━━━━━\n📅 날짜: ${selectedDayKey}\n🚢 배이름: ${f.ship || '-'}\n💰 선비: ${f.fee || '0'}원\n🏦 계좌: ${f.account || '미등록'}\n👥 명단: ${nList}\n🎯 어종: ${f.species || '-'}\n⛺ 타입: ${f.place || '선상'}\n🚩 상태: ${f.status}\n🔗 링크: ${f.link || '-'}${pbT}`;
+                const text = `[FISHING LIFE 2025]\n━━━━━━━━━━━━\n📅 날짜: ${selectedDayKey}\n🚢 배이름: ${f.ship || '-'}\n💰 선비: ${f.fee || '0'}원\n🏦 계좌: ${f.account || '미등록'}\n👥 명단: ${nList}\n🎯 어종: ${f.species || '-'}\n⛺ 타입: ${f.place || '선상'}\n🚩 상태: ${f.status}\n🔗 링크: ${f.link || '-'}`;
                 const dummy = document.createElement("textarea"); document.body.appendChild(dummy); dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
-                showAlert("복사 완료", "카톡에 정보를 공유하세요.");
+                showAlert("복사 완료", "일정 정보를 카톡에 공유하세요.");
             };
 
             const exportStats = () => {
@@ -568,37 +476,26 @@
                     }
                 });
                 const dummy = document.createElement("textarea"); document.body.appendChild(dummy); dummy.value = pbT; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
-                showAlert("복사 완료", "현황 데이터가 카톡 공유용으로 복사되었습니다.");
+                showAlert("복사 완료", "현황 데이터가 복사되었습니다.");
             };
 
-            // 스와이프 이벤트 핸들러
+            // 스와이프 기능
             const handleTouchStart = (e) => {
-                setTouchEndX(null);
-                setTouchEndY(null);
+                setTouchEndX(null); setTouchEndY(null);
                 setTouchStartX(e.targetTouches[0].clientX);
                 setTouchStartY(e.targetTouches[0].clientY);
             };
-
             const handleTouchMove = (e) => {
                 setTouchEndX(e.targetTouches[0].clientX);
                 setTouchEndY(e.targetTouches[0].clientY);
             };
-
             const handleTouchEnd = () => {
                 if (!touchStartX || !touchEndX || !touchStartY || !touchEndY) return;
                 const distanceX = touchStartX - touchEndX;
                 const distanceY = touchStartY - touchEndY;
-                const minSwipeDistance = 50;
-
-                // 수평 이동 거리가 수직 이동 거리보다 크고, 최소 스와이프 거리를 초과할 때만 달력 변경
-                if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > minSwipeDistance) {
-                    if (distanceX > 0) {
-                        // 왼쪽 스와이프: 다음 달
-                        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-                    } else {
-                        // 오른쪽 스와이프: 이전 달
-                        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-                    }
+                if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 50) {
+                    if (distanceX > 0) setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+                    else setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
                 }
             };
 
@@ -621,6 +518,7 @@
                         </div>
                         <div className="flex gap-1 font-bold text-black">
                             <select value={currentDate.getFullYear()} onChange={e=>setCurrentDate(new Date(e.target.value, currentDate.getMonth(), 1))} className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm font-black outline-none text-black">
+                                {/* 2040년까지 달력 옵션 확장 */}
                                 {[...Array(16)].map((_, i) => {
                                     const yr = 2025 + i;
                                     return <option key={yr} value={yr}>{yr}년</option>;
@@ -630,6 +528,7 @@
                         </div>
                     </header>
 
+                    {/* 스와이프 이벤트를 감지할 메인 영역 */}
                     <main 
                         className="flex-1 overflow-y-auto no-scrollbar relative z-10 px-2 pb-24 text-left leading-none text-black"
                         onTouchStart={activeTab === 'calendar' ? handleTouchStart : undefined}
@@ -637,47 +536,49 @@
                         onTouchEnd={activeTab === 'calendar' ? handleTouchEnd : undefined}
                     >
                         <div className="animate-in fade-in duration-500">
-                            <div className="grid grid-cols-7 py-2 font-black text-[10px] text-slate-300 text-center tracking-widest uppercase">
-                                <div className="text-rose-500">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div className="text-blue-500">Sat</div>
-                            </div>
                             {activeTab === 'calendar' ? (
-                                <div className="grid grid-cols-7 gap-1 px-1">
-                                    {calendarCells.map((cell, idx) => {
-                                        const isSun = idx % 7 === 0;
-                                        const isSat = idx % 7 === 6;
-                                        const hol = HOLIDAYS[cell.key];
-                                        const tide = getTideValue(cell.key);
-                                        const isToday = cell.key === todayKey;
-                                        return (
-                                            <div key={idx} className="day-cell relative text-black leading-none">
-                                                {cell.type === 'day' && (
-                                                    <button onClick={() => { setSelectedDayKey(cell.key); setModalType('choice'); }} className={`w-full h-full rounded-xl border flex flex-col p-1.5 transition-all active:scale-95 overflow-hidden shadow-sm ${cell.data ? 'bg-white border-rose-500 ring-2 ring-rose-50 shadow-md' : 'bg-white/60 border-slate-50'} ${isToday ? 'ring-2 ring-cyan-500' : ''}`}>
-                                                        <div className="flex justify-between items-start mb-1 text-black font-black w-full">
-                                                            <span className={`text-[12px] font-black ${isToday ? 'bg-cyan-500 text-white px-1.5 rounded-md shadow-sm' : (isSun || hol ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-900')}`}>{cell.day}</span>
-                                                            {hol && <span className="text-[6px] font-black text-rose-400 truncate max-w-[25px]">{hol}</span>}
-                                                        </div>
-                                                        {cell.data ? (
-                                                            <div className="flex-1 flex flex-col gap-0.5 text-left w-full overflow-hidden text-black leading-tight">
-                                                                <div className="text-[12px] font-black text-slate-950 truncate italic mb-0.5">{Object.keys(cell.data)[0]}</div>
-                                                                <div className="text-[8px] font-bold text-emerald-600 leading-none">외 {Object.keys(cell.data).length-1}명</div>
-                                                                <div className={`text-[11px] font-black leading-none py-1 ${cell.data[Object.keys(cell.data)[0]].status === '휴무' ? 'text-slate-300' : 'text-rose-600 uppercase font-black italic'}`}>{cell.data[Object.keys(cell.data)[0]].status === '휴무' ? '휴무' : '출조!!'}</div>
-                                                                <div className="mt-auto h-4"></div>
-                                                                <div className="w-full mt-0.5 border-t border-slate-50 pt-1 text-center">
-                                                                    <div className="text-[11px] font-black text-slate-950 text-center leading-none italic font-black text-black"><b>{tide}</b></div>
+                                <>
+                                    <div className="grid grid-cols-7 py-2 font-black text-[10px] text-slate-300 text-center tracking-widest uppercase">
+                                        <div className="text-rose-500">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div className="text-blue-500">Sat</div>
+                                    </div>
+                                    <div className="grid grid-cols-7 gap-1 px-1">
+                                        {calendarCells.map((cell, idx) => {
+                                            const isSun = idx % 7 === 0;
+                                            const isSat = idx % 7 === 6;
+                                            const hol = HOLIDAYS[cell.key];
+                                            const tide = getTideValue(cell.key);
+                                            const isToday = cell.key === todayKey;
+                                            return (
+                                                <div key={idx} className="day-cell relative text-black leading-none">
+                                                    {cell.type === 'day' && (
+                                                        <button onClick={() => { setSelectedDayKey(cell.key); setModalType('choice'); }} className={`w-full h-full rounded-xl border flex flex-col p-1.5 transition-all active:scale-95 overflow-hidden shadow-sm ${cell.data ? 'bg-white border-rose-500 ring-2 ring-rose-50 shadow-md' : 'bg-white/60 border-slate-50'} ${isToday ? 'ring-2 ring-cyan-500' : ''}`}>
+                                                            <div className="flex justify-between items-start mb-1 text-black font-black w-full">
+                                                                <span className={`text-[12px] font-black ${isToday ? 'bg-cyan-500 text-white px-1.5 rounded-md shadow-sm' : (isSun || hol ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-900')}`}>{cell.day}</span>
+                                                                {hol && <span className="text-[6px] font-black text-rose-400 truncate max-w-[25px]">{hol}</span>}
+                                                            </div>
+                                                            {cell.data ? (
+                                                                <div className="flex-1 flex flex-col gap-0.5 text-left w-full overflow-hidden text-black leading-tight">
+                                                                    <div className="text-[12px] font-black text-slate-950 truncate italic mb-0.5">{Object.keys(cell.data)[0]}</div>
+                                                                    <div className="text-[8px] font-bold text-emerald-600 leading-none">외 {Object.keys(cell.data).length-1}명</div>
+                                                                    <div className={`text-[11px] font-black leading-none py-1 ${cell.data[Object.keys(cell.data)[0]].status === '휴무' ? 'text-slate-300' : 'text-rose-600 uppercase font-black italic'}`}>{cell.data[Object.keys(cell.data)[0]].status === '휴무' ? '휴무' : '출조!!'}</div>
+                                                                    <div className="mt-auto h-4"></div>
+                                                                    <div className="w-full mt-0.5 border-t border-slate-50 pt-1 text-center">
+                                                                        <div className="text-[11px] font-black text-slate-950 text-center leading-none italic font-black text-black"><b>{tide}</b></div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="mt-auto flex flex-col items-center opacity-40 text-center w-full">
-                                                                <span className="text-[11px] font-black text-slate-950 italic text-center italic font-black text-black"><b>{tide}</b></span>
-                                                                <div className="w-full h-0.5 bg-slate-100 rounded-full mt-1"></div>
-                                                            </div>
-                                                        )}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                                            ) : (
+                                                                <div className="mt-auto flex flex-col items-center opacity-40 text-center w-full">
+                                                                    <span className="text-[11px] font-black text-slate-950 italic text-center italic font-black text-black"><b>{tide}</b></span>
+                                                                    <div className="w-full h-0.5 bg-slate-100 rounded-full mt-1"></div>
+                                                                </div>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
                             ) : (
                                 <div className="space-y-6 py-4 px-2 text-left text-black">
                                     <div className="flex justify-between items-end border-b-2 border-black pb-2 px-1">
@@ -689,7 +590,7 @@
                                             </select>
                                         </div>
                                         <button onClick={exportStats} className="bg-cyan-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black active:scale-95 shadow-md flex items-center gap-1">
-                                            <Icon name="Share" className="w-3 h-3 text-white" /> 현황 내보내기
+                                            <Icon name="Share" className="w-3 h-3 text-white" /> 내보내기
                                         </button>
                                     </div>
                                     {displayMembers.map(m => {
